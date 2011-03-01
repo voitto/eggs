@@ -1,0 +1,20 @@
+
+
+
+Eggs, a little wiki
+
+
+INSTALLATION
+
+
+
+git clone git://github.com/voitto/eggs.git
+mv eggs/* .
+vi index.php
+
+
+// add the following two lines to index.php
+// you can get a username/password from https://datamullet.com
+
+define('USR','tangosalsa');
+define('PWD','tangosalsa');
