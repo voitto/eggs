@@ -1,0 +1,186 @@
+<html>
+
+<head>
+
+<script src="structal/evently/jquery.tools.min.js" type="text/javascript"></script>
+<script src="structal/evently/jquery.mustache.js" type="text/javascript"></script>
+<script src="structal/evently/jquery.evently.js" type="text/javascript"></script>
+<script src="structal/evently/jquery.pathbinder.js" type="text/javascript"></script>
+<script src="structal/evently/jquery.fileupload.js" type="text/javascript"></script>
+<script src="structal/evently/jquery.fileupload-ui.js" type="text/javascript"></script>
+
+<script language="JavaScript" type="text/javascript">
+
+resource = '{{resource}}';
+
+(function(){
+	
+  window.Structal = {}
+
+  Structal.App = {
+
+    init: function(){
+      
+	    //setInterval(Structal.App.poll, 10*1000)
+      //Structal.App.poll()
+			$.pathbinder.onChange(function(path) {
+		    //alert(path);
+		  });
+   
+		  {{{pathbinder}}}
+
+    },
+
+    poll: function(){
+      $.ajax({
+        type: 'GET',
+        url: '/changes',
+        dataType: 'json',
+        cache: false,
+        success: function(json){
+	        $("#content").trigger('poll',json);
+        }
+      })
+    }
+  }
+
+})();
+
+$(function(){
+  Structal.App.init()
+});
+
+
+
+</script>
+
+</head>
+
+<body>
+
+
+
+<div id="content"></div>
+
+
+<script language="JavaScript" type="text/javascript">
+
+ 	$("#content").evently({
+  	getTemplate : function(e, resp) {
+		  var widget = $(this);
+		  var resource = resp['resource'];
+		  var action = resp['action'];
+		  var id = resp['id'];
+      $.ajax({
+        type : 'POST',
+				data : {},
+				url : '/templates/'+resource+'/'+action+'.html',
+        complete : function(req) {
+    		  partial = $.httpData(req,"html").toString();
+          widget.trigger('getJson',{'resource':resource,'id':id,'action':action});
+          return false;
+        }
+      })
+      return false;
+		},
+	  getJson : function(e, resp) {
+		  var widget = $(this);
+		  if (resp['id'] == false)
+	      var posturl = '/'+resp['resource']+'/'+resp['action'];
+		  else
+        var posturl = '/'+resp['resource']+'/'+resp['id']+'/'+resp['action'];
+      $.ajax({
+        type : 'POST',
+				data : {},
+				cache : false,
+				url : posturl,
+        complete : function(req) {
+          resp = $.httpData(req,"json");
+          widget.trigger('render',resp);
+          return false;
+        }
+      })
+      return false;
+		},
+		render : {
+			mustache : function() {
+				return partial;
+			},
+			data : function(e,resp) {
+				return resp;
+			}
+		},
+		showNew : {
+		  path : '/:resource/new',
+		  after : function(e,params) {
+		    $(this).trigger('getTemplate',{'resource':params['resource'],'action':'new','id':false});
+		  } 
+		},
+		showEdit : {
+		  path : '/:resource/:id/edit',
+		  after : function(e,params) {
+		    $(this).trigger('getTemplate',{'resource':params['resource'],'action':'edit','id':params['id']});
+		  }
+		},
+		showDestroy : {
+		  path : '/:resource/:id/destroy',
+		  after : function(e,params) {
+		    $(this).trigger('getTemplate',{'resource':params['resource'],'action':'destroy','id':params['id']});
+		  }
+		},
+		showIndex : {
+		  path : '/',
+		  after : function(e,params) {
+		    $(this).trigger('getTemplate',{'resource':resource,'action':'index','id':false});
+		  }
+		},
+		showResource : {
+		  path : '/'+resource,
+		  after : function(e,params) {
+		    $(this).trigger('getTemplate',{'resource':resource,'action':'index','id':false});
+		  }
+		},
+		showShow : {
+		  path : '/:resource/:id',
+		  after : function(e,params) {
+		    $(this).trigger('getTemplate',{'resource':params['resource'],'action':'show','id':params['id']});
+		  }
+		},
+		poll : {
+      data : function(e, data) {
+  			var feeds=new Array();
+  			for (var feed in data['updatedFeeds']['updatedFeed']){
+  				feedtitle = data['updatedFeeds']['updatedFeed'][feed]['feedTitle'];
+  				for (var item in data['updatedFeeds']['updatedFeed'][feed]['item']){
+  				  title = data['updatedFeeds']['updatedFeed'][feed]['item'][item]['title'];
+  				  body = data['updatedFeeds']['updatedFeed'][feed]['item'][item]['body'];
+  				  if (undefined !== title)
+  						feeds[feedtitle] = true;
+  			  }
+  			}
+  			sources = new Array();
+  			feedarr = new Array();
+  			var id = 0;
+  			for(var f in feeds) {
+  				var a = new Array();
+  				a['name'] = f;
+  				a['id'] = id;
+  				feedarr[id] = f;
+  				sources.push(a);
+  				id++;
+  			}
+  			$(this).data('feeds',feedarr);
+        return {
+  	      sources : sources
+        };
+      },
+  		mustache : '<li></li>'
+		}
+	});
+
+</script>
+
+
+</body>
+
+</html>

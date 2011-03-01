@@ -1,0 +1,31 @@
+
+<div id="pages">
+<form>
+  <p>New Page</p>
+  <input name="title"/>
+  <input type="submit"/>
+</form>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+
+    $('#pages form').submit(function() {
+			$.ajax({
+				type : 'POST',
+				data : {
+				  'title': $('input[name=title]').val()
+				},
+        url : '/pages/new',
+        success : function(req) {
+	        if (false == req['ok']) {
+		 				alert('sorry, I could not create a page');
+	        } else  {
+		        alert('created it');
+		      }
+	        return false;
+        }
+      })
+		  return false;
+	  });
+
+</script>

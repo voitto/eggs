@@ -1,0 +1,33 @@
+
+<div id="pages">
+<form>
+  <p>Edit Page</p>
+  <input name="title" value="{{title}}"/>
+  <textarea name="content" cols="40" rows="10">{{content}}</textarea>
+  <input type="submit"/>
+</form>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+
+    $('#pages form').submit(function() {
+			$.ajax({
+				type : 'POST',
+				data : {
+				  'title': $('input[name=title]').val(),
+				  'content': $('textarea[name=content]').val()
+				},
+        url : '/pages/{{key}}/edit',
+        success : function(req) {
+	        if (false == req['ok']) {
+		 				alert('sorry, I could not edit the page');
+	        } else  {
+		        alert('edited');
+		      }
+	        return false;
+        }
+      })
+		  return false;
+	  });
+
+</script>
