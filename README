@@ -8,13 +8,31 @@ INSTALLATION
 
 
 
+
+
+
+
+1. Download
+------------
+
 git clone git://github.com/voitto/eggs.git
 mv eggs/* .
-vi index.php
+mv eggs/.htaccess .
 
+
+
+2. Edit index.php
+------------------
 
 // add the following two lines to index.php
 // you can get a username/password from https://datamullet.com
 
 define('USR','tangosalsa');
 define('PWD','tangosalsa');
+
+
+
+3. Edit .htaccess
+-------------------
+
+// edit .htaccess to set your base path
