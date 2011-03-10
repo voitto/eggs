@@ -45,7 +45,7 @@ class Pages extends MulletMapper {
 
 	  $page = $cursor->getNext();
 
-		return array('ok'=>true,'content'=>$page->content,'key'=>$page->keyname);
+		return array('ok'=>true,'content'=>urldecode(stripslashes($page->content)),'key'=>$page->keyname);
 		
 	}
 	
